@@ -68,14 +68,15 @@ def by_category(category):
     return json.dumps(results)
 
 
-# @app.get("/api/catalog/lower/<amount>")
-# def lower_than(amount):
-    #results = []
-    # for prod in catalog:
-    # if prod["price"] < float(amount):
-    # results.append(prod)
+@app.get("/api/catalog/lower/<amount>")
+def lower_than(amount):
+    results = []
+    for prod in catalog:
+        if prod["price"] < float(amount):
+            results.append(prod)
 
-  #  return json.dumps(results)
+    return json.dumps(results)
+
 
 @app.get("/api/category/unique")
 def unique_cat():
