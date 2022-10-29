@@ -24,3 +24,10 @@ python -m pip install flask
 
 # run the server
 python server.py
+
+#how to properly run the server using flask
+flask --app server --debug run
+
+db = client.get_database("fequipment")
+
+
