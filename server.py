@@ -62,6 +62,30 @@ def save_product():
     if product is None:
         return abort(400, "product required")
 
+    # should be a title
+    if "title" not in product:
+        return abort(400, "title required")
+
+    # the title should have at least 5 chars
+    if len(product["title"]) < 5:
+        return abort(400, "title too short")
+
+    # should be a category
+    if "category" not in product:
+        return abort(400, "category required")
+
+    # should be a price
+    if "price" not in product:
+        return abort(400, "price required")
+
+    # the price should be a number (int or float)
+    if not isinstance(product["price"], (int, float)):
+        return abort(400, "price must be a number")
+
+    # the number should be greater than 0
+    if product["price"] <= 0:
+        return abort(400, "Invalid price")
+
     product["category"] = "Category".lower()
 
     db.products.insert_one(product)
@@ -157,6 +181,64 @@ def unique_cat():
         results.append(cat)
 
     return json.dumps(results)
+
+
+# @app.post("/api/coupons")
+# def save_coupons():
+    #coupon = request.get_json()
+   # if coupon is None:
+
+   # db.coupons.insert_one(coupon)
+
+   # coupon["_id"] = str(coupon["_id"])
+
+    # return json.dumps(coupon)
+
+@app.post("/api/coupons")
+def save_coupons():
+    coupon = request.get_json()
+    if not coupon:
+        return abort(400, "Coupon required")
+
+    if not "code" in coupon:
+        return abort(400, "Code required")
+
+    if not "discount" in coupon:
+        return abort(400, "Discount required")
+
+    if (not isinstance(coupon["discount"], int)) and (not isinstance(coupon["discount"], float)):
+        return abort(400, "Discount must be a number")
+
+    db.coupons.insert_one(coupon)
+    fix_id(coupon)
+    return json.dumps(coupon)
+
+
+@app.get("/api/coupons")
+def get_coupons():
+    results = []
+
+    cursor = db.coupons.find({})
+    for coupon in cursor:
+        results.append(fix_id(coupon))
+    return json.dumps(results)
+
+
+@app.delete("/api/coupons/<id>")
+def delete_coupons(id):
+
+    res = db.coupons.delete_one({"_id": ObjectId(id)})
+
+    return json.dumps({"count": res.deleted_count})
+
+
+@app.get("/api/coupons/<code>")
+def get_codes(code):
+    result = db.coupons.find_one({"code": code})
+    if result:
+        return json.dumps(fix_id(result))
+
+    return abort(404, "Code not found")
 
 
 @app.get("/api/test/colors")
