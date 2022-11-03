@@ -1,10 +1,16 @@
+from unittest import result
 from flask import Flask, request, abort
 import json
 from config import me, db
 from mock_data import catalog
 from bson import ObjectId
+from flask_cors import CORS
+
 
 app = Flask("Server")
+CORS(app)  # disable CORS, enable PROD
+
+# if you are running on debug mode, disable CORS
 
 
 @app.get("/")
